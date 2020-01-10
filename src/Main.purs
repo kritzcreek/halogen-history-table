@@ -3,8 +3,11 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log)
+import HalogenHistoryView as HHV
+import Halogen.Aff as HA
+import Halogen.VDom.Driver (runUI)
 
 main :: Effect Unit
-main = do
-  log "🍝"
+main = HA.runHalogenAff do
+  body <- HA.awaitBody
+  runUI HHV.component unit body

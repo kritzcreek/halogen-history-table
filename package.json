@@ -7,12 +7,14 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "spago bundle-app -t public/index.js",
+    "watch": "parcel public/index.html"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "purescript": "^0.13.5",
-    "build": "spago build"
+    "parcel-bundler": "^1.12.4",
+    "purescript": "^0.13.5"
   }
 }
