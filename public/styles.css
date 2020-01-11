@@ -1,37 +1,57 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   display: inline-block;
-  font-family: sans-serif;
+  font-family: Consolas, monospace;
 }
 
-.container {
-  font-size: 25px;
-}
-
-.hhv-table {
+table {
   border-collapse: collapse;
 }
 
-.hhv-TableHeader {
-  padding: 10px 10px;
-  border-bottom: 1px solid black;
+.container {
+  font-size: 23px;
 }
-.hhv-TableHeader--filtered {
+
+.TableHeader {
+  padding: 5px 15px;
+  text-align: left;
+  border-bottom: 2px solid black;
+  user-select: none;
+}
+
+.TableHeader:hover {
+  background-color: rgb(230, 230, 230);
+}
+
+.TableHeader--filtered {
   background: rgba(0, 255, 0, 0.2);
 }
 
-.hhv-TableRow--filtered {
+.TableHeader--filtered:hover {
+  background: rgba(0, 255, 0, 0.3);
+}
+
+.TableRow:last-child {
+  border-top: 2px solid black;
+}
+
+.TableRow--filtered {
   display: none;
 }
 
-.hhv-TableElement {
-  text-align: center;
-  padding: 10px 10px;
-  border-bottom: 1px solid black;
-}
-.hhv-TableElement--shadow {
-  color: rgba(0, 0, 0, 0.25);
+.TableElement {
+  line-height: 1;
+  text-align: left;
+  padding: 5px 15px;
 }
 
-.hhv-TableElement--columnheader {
-  border-right: 5px solid blue;
+.TableElement:first-child {
+  border-right: 2px solid black;
+}
+
+.TableElement--shadow {
+  color: rgba(0, 0, 0, 0.25);
 }

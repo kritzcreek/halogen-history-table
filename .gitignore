@@ -9,3 +9,5 @@
 /.psa*
 /.spago
 /public/index.js
+/dist/
+/.cache/
