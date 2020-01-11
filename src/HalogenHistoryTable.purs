@@ -9,10 +9,14 @@ import Data.Foldable (fold, foldl)
 import Data.Maybe (Maybe(..), fromMaybe, isJust, isNothing, maybe)
 import Data.Newtype (un)
 import Data.String as String
+import Data.Variant (Variant)
+import Data.Variant as V
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Prim.Row as Row
+import Type.Prelude (class IsSymbol, SProxy(..), reflectSymbol)
 
 type PersonR f =
   ( birthday :: f String
@@ -24,6 +28,7 @@ type Begone a = a
 type Person = Record (PersonR Begone)
 type PersonUpdate = Record (date :: String | PersonR Maybe)
 type Filters = Record (PersonR (Const Boolean))
+type FilterToggle = Variant (PersonR (Const Boolean))
 
 applyUpdate :: Person -> PersonUpdate -> Person
 applyUpdate person update =
@@ -80,7 +85,7 @@ type State =
 data Action
   = HoverRow Int
   | LeaveTable
-  | ToggleFilter String
+  | ToggleFilter FilterToggle
 
 component :: forall q i o m. H.Component HH.HTML q i o m
 component =
@@ -180,22 +185,28 @@ tableHeader state =
         [ HH.th
             [ HP.class_ (H.ClassName "TableHeader") ]
             [ HH.text "" ]
-        , mkCell state.filters.name "Name"
-        , mkCell state.filters.birthday "Birthday"
-        , mkCell state.filters.rating "Rating"
+        , mkCell state.filters.name (SProxy::_"name")
+        , mkCell state.filters.birthday (SProxy::_"birthday")
+        , mkCell state.filters.rating (SProxy::_"rating")
         ]
     ]
   where
-    mkCell :: forall a. Const Boolean a -> String -> Html m
+    mkCell
+      :: forall a _b sym
+      . IsSymbol sym
+      => Row.Cons sym (Const Boolean a) _b (PersonR (Const Boolean))
+      => Const Boolean a
+      -> SProxy sym
+      -> Html m
     mkCell filtered label =
       HH.th
         [ HP.classes $ fold
             [ pure (H.ClassName "TableHeader")
             , guard (un Const filtered) $> H.ClassName "TableHeader--filtered"
             ]
-        , HE.onClick (\_ -> Just (ToggleFilter (String.toLower label)))
+        , HE.onClick (\_ -> Just (ToggleFilter (V.inj label (not filtered))))
         ]
-        [ HH.text label ]
+        [ HH.text (String. (reflectSymbol label)) ]
 
 handleAction ∷ forall o m. Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
@@ -203,12 +214,12 @@ handleAction = case _ of
     H.modify_ (_ { hoveredRow = Just ix })
   LeaveTable ->
     H.modify_ (_ { hoveredRow = Nothing })
-  ToggleFilter lbl ->
-    H.modify_
-      (\prev ->
-        prev { filters = case lbl of
-                  "name" -> prev.filters { name = not prev.filters.name }
-                  "birthday" -> prev.filters { birthday = not prev.filters.birthday }
-                  "rating" -> prev.filters { rating = not prev.filters.rating }
-                  _ -> prev.filters
-             })
+  ToggleFilter f -> do
+    { filters } <- H.get
+    let
+      newFilters = V.match
+        { name: filters { name = _ }
+        , birthday: filters { birthday = _ }
+        , rating: filters { rating = _ }
+        } f
+    H.modify_ (_ { filters = newFilters})
