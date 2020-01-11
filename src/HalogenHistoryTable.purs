@@ -1,4 +1,4 @@
-module HalogenHistoryView where
+module HalogenHistoryTable where
 
 import Prelude
 
