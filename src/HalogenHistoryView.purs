@@ -58,7 +58,8 @@ initialPerson =
 
 updates :: Array PersonUpdate
 updates =
-  [ (emptyUpdate "09.01.2020") { name = Just "Christoph" }
+  [ (emptyUpdate "09.01.2020") { rating = Just 9 }
+  , (emptyUpdate "09.01.2020") { name = Just "Christoph" }
   , (emptyUpdate "07.01.2020") { rating = Just 10 }
   , (emptyUpdate "05.01.2020") { birthday = Just "20.02.1992" }
   , (emptyUpdate "03.01.2020") { name = Just "Carlotta" }

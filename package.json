@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "spago build",
     "build": "spago bundle-app -t public/index.js",
     "watch": "parcel public/index.html"
   },
