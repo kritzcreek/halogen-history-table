@@ -1,11 +1,12 @@
 {
   "scripts": {
     "compile": "spago build",
-    "build": "spago bundle-app -t public/index.js",
+    "build": "spago bundle-app -t public/bundle.js && parcel build public/index.html --public-url .",
     "watch": "parcel public/index.html"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.4",
+    "parcel-plugin-inliner": "^1.0.10",
     "purescript": "^0.13.5",
     "spago": "^0.13.1"
   }

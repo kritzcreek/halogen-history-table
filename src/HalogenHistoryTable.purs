@@ -206,7 +206,7 @@ tableHeader state =
             ]
         , HE.onClick (\_ -> Just (ToggleFilter (V.inj label (not filtered))))
         ]
-        [ HH.text (String. (reflectSymbol label)) ]
+        [ HH.text (String.toUpper (reflectSymbol label)) ]
 
 handleAction ∷ forall o m. Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
