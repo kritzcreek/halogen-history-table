@@ -6,8 +6,7 @@ import Control.MonadPlus (guard)
 import Data.Array as Array
 import Data.Const (Const(..))
 import Data.Foldable (fold, foldl)
-import Data.Identity (Identity(..))
-import Data.Maybe (Maybe(..), isJust, isNothing, maybe)
+import Data.Maybe (Maybe(..), fromMaybe, isJust, isNothing, maybe)
 import Data.Newtype (un)
 import Data.String as String
 import Halogen as H
@@ -21,15 +20,16 @@ type PersonR f =
   , rating :: f Int
   )
 
-type Person = Record (PersonR Identity)
+type Begone a = a
+type Person = Record (PersonR Begone)
 type PersonUpdate = Record (date :: String | PersonR Maybe)
 type Filters = Record (PersonR (Const Boolean))
 
 applyUpdate :: Person -> PersonUpdate -> Person
 applyUpdate person update =
-  { birthday: maybe person.birthday Identity update.birthday
-  , name: maybe person.name Identity update.name
-  , rating: maybe person.rating Identity update.rating
+  { birthday: fromMaybe person.birthday update.birthday
+  , name: fromMaybe person.name update.name
+  , rating: fromMaybe person.rating update.rating
   }
 
 applyUpdates :: Person -> Array PersonUpdate -> Person
@@ -51,9 +51,9 @@ isFiltered filters update =
 
 initialPerson :: Person
 initialPerson =
-  { birthday: Identity "01.01.1970"
-  , name: Identity "Carl"
-  , rating: Identity 1
+  { birthday: "01.01.1970"
+  , name: "Carl"
+  , rating: 1
   }
 
 updates :: Array PersonUpdate
@@ -128,7 +128,7 @@ table state =
               (Array.length state.updates - ix)
               state.updates)
         filtered = isFiltered state.filters update
-        mkCell :: forall a. (a -> String) -> Identity a -> Maybe a -> Html m
+        mkCell :: forall a. (a -> String) -> a -> Maybe a -> Html m
         mkCell display shadowVal val =
           HH.td
             [ HP.classes $ fold
@@ -138,7 +138,7 @@ table state =
             ]
             [ HH.text
                 if active
-                then display (un Identity shadowVal)
+                then display shadowVal
                 else maybe "" display val
             ] in
       HH.tr
@@ -161,17 +161,16 @@ personRow :: forall m. String -> Person -> Html m
 personRow label person =
   HH.tr
       [ HP.class_ (HH.ClassName "TableRow") ]
-      [ mkCell identity (Identity label)
-      , mkCell identity person.name
-      , mkCell identity person.birthday
-      , mkCell show person.rating
+      [ mkCell label
+      , mkCell person.name
+      , mkCell person.birthday
+      , mkCell (show person.rating)
       ]
   where
-    mkCell :: forall a. (a -> String) -> Identity a -> Html m
-    mkCell display val =
+    mkCell text =
       HH.td
         [ HP.class_ (HH.ClassName "TableElement") ]
-        [ HH.text (display (un Identity val)) ]
+        [ HH.text text ]
 
 tableHeader :: forall m. State -> Html m
 tableHeader state =
